@@ -20,6 +20,18 @@ def test_bfs_no_path_graph():
     assert g.bfs('1', '12') == ['1', '2', '7', '9', '11', '12']
     assert g.bfs('12', '1') == None
 
+def test_bfs_incorrect_start_node():
+    """Incorrect input parameters should yield a KeyError."""
+    g = graph.Graph('data/tiny_network.adjlist')
+    with pytest.raises(KeyError):
+        g.bfs('foobar')
+
+def test_bfs_incorrect_end_node():
+    """Incorrect input parameters should yield a KeyError."""
+    g = graph.Graph('data/tiny_network.adjlist')
+    with pytest.raises(KeyError):
+        g.bfs('Tony Capra', 'foobar')
+
 def test_bfs_traversal():
     """
     Run breadth first traversal with tiny_network.adjlist. Confirm general

@@ -14,7 +14,8 @@ class Graph:
 
     def _return_path(self, breadcrumbs, start, end):
         """
-        Generates path from start to end nodes.
+        Generates path from start to end nodes using a linked-list-esque
+        backtracking.
 
         Args:
             breadcrumbs (dict): list of nodes to their previous nodes from start.
@@ -28,7 +29,24 @@ class Graph:
         while curr != start:
             curr = breadcrumbs[curr]
             path.append(curr)
+        # Reversing a backtrack gives the correct-order path.
         return path[::-1]
+
+    def _handle_bfs_input_validation(self, start, end=None):
+        """Helper method to handle incorrect inputs to bfs method."""
+        try:
+            self.graph[start]
+        except KeyError:
+            raise KeyError(
+                f'Start node "{start}" does not exist in the graph.'
+            )
+        if end:
+            try:
+                self.graph[end]
+            except KeyError:
+                raise KeyError(
+                    f'End node "{end}" does not exist in the graph.'
+                )
 
     def bfs(self, start, end=None):
         """
@@ -41,24 +59,47 @@ class Graph:
             List of nodes representing either a traversal of the connected
             component of the graph or a path from the start to end node.
         """
-        queue = [start]
-        order = []
-        explored = set()
+        self._handle_bfs_input_validation(start, end)
+        if start == end:
+            # Return an empty list if start == end - no work needed.
+            return []
         if end:
             breadcrumbs = {start: ''}
 
+        # 'queue' and 'visited' are used for determining the next BFS-approved
+        # node to explore, and 'order' is tracking the order of traversal.
+        queue = [start]
+        order = []
+        visited = set()
+
         while queue:
+            # Evaluate next node.
             current_name = queue.pop(0)
-            if current_name in explored:
+            # Prevent computational loop with the set 'visited'.
+            if current_name in visited:
                 continue
-            explored.add(current_name)
+            visited.add(current_name)
+            # Add node to traversal list if we're listing all of them.
             if not end:
                 order.append(current_name)
+            # Go through the outbound edges of the node and add to the queue if
+            # they are unvisited.
             current_node = self.graph[current_name]
             for node in current_node.keys():
-                if end and node not in explored:
+                # If returning a path, populate a "breadcrumb" dictionary that
+                # keeps track of what each node's predecessor is.
+                if end and (node not in visited):
                     breadcrumbs[node] = current_name
                     if node == end:
+                        # Determine the path when the end node is reached.
                         return self._return_path(breadcrumbs, start, end)
-                queue.append(node)
-        return order or None
+                # Cut down on unnecessary appends by checking if node is
+                # already explored.
+                if node not in visited:
+                    queue.append(node)
+
+        # If traversing the graph, return every visited node. If looking for a
+        # path and none was found, return None as a signal it doesn't exist.
+        if end:
+            return None
+        return order

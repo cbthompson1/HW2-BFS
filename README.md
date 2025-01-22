@@ -75,3 +75,22 @@ Make sure to push all your code to github, ensure that your unit tests are corre
 * Readable code with clear comments and method descriptions
 * Updated README with description of your methods
 
+# Methods
+
+## _return_path
+
+This method produces a path from nodes `start` to `end` using previous work
+done by a BFS traversal.
+
+## _handle_bfs_input_validation
+
+This (private) method ensures faulty start/end nodes given to the BFS method
+don't break the code or object, and produce errors before any real work is
+done.
+
+## bfs
+
+The big kahuna. This method either traverses a graph (or at least a connected
+component of it) and returns the nodes it visits, or it does its best to find
+a path between two provided nodes. It utilizes the BFS search method. If no
+path is found, it returns the `None` type.
